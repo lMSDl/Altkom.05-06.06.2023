@@ -20,8 +20,11 @@ namespace WebApi.Controllers
         [NonAction]
         public override Task<IActionResult> Get()
         {
-            return base.Get();
+            //opcjonlanie:
+            return null!;
+            //return base.Get();
         }
+
 
 
         [HttpGet]
@@ -29,7 +32,7 @@ namespace WebApi.Controllers
         {
             if(string.IsNullOrWhiteSpace(username))
             {
-                return await Get();
+                return await base.Get();
             }
 
             var user = await _service.FindByNameAsync(username);

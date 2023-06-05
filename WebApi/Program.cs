@@ -13,6 +13,7 @@ using FluentValidation.AspNetCore;
 using System.Text.Json.Serialization;
 using WebApi.Validators;
 using WebApi.Filters;
+using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,21 @@ builder.Services.AddControllers()
                     x.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.None;
                 });
 
+
+builder.Services.AddResponseCompression(x =>
+{
+    x.Providers.Clear();
+    x.Providers.Add<GzipCompressionProvider>();
+    x.Providers.Add<BrotliCompressionProvider>();
+
+    //kompresja dla https domyœlnie jest wy³¹czona
+    x.EnableForHttps = true;
+});
+
+builder.Services.Configure<GzipCompressionProviderOptions>(x => x.Level = System.IO.Compression.CompressionLevel.Optimal);
+builder.Services.Configure<BrotliCompressionProviderOptions>(x => x.Level = System.IO.Compression.CompressionLevel.Fastest);
+
+
 //builder.Services.AddFluentValidationAutoValidation(x => x.);
 builder.Services.AddTransient<IValidator<Product>, ProductValidator>();
 
@@ -54,6 +70,9 @@ builder.Services.AddTransient<ConsoleLogFilter>();
 builder.Services.AddSingleton(x => new LimitFilter(5));
 
 var app = builder.Build();
+
+
+app.UseResponseCompression();
 
 app.Use(async (context, next) =>
 {

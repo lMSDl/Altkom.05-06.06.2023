@@ -3,15 +3,28 @@
 
 using Models;
 using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
-HttpClient httpClient = new()
+
+HttpClientHandler clientHandler = new()
+{
+    AutomaticDecompression = System.Net.DecompressionMethods.Brotli | System.Net.DecompressionMethods.GZip,
+
+    //akceptujemy certyfikaty self-signed
+    ClientCertificateOptions = ClientCertificateOption.Manual,
+    ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, certChain, policy) => { return true; }
+};
+
+HttpClient httpClient = new(clientHandler)
 {
     BaseAddress = new Uri("http://localhost:5209/api/")
 };
 httpClient.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse("application/json"));
+httpClient.DefaultRequestHeaders.AcceptEncoding.Add(StringWithQualityHeaderValue.Parse("br"));
+
 HttpResponseMessage response;
 
 for (int i = 0; i < 10; i++)

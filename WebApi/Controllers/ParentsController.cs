@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebApi.Filters;
 
 namespace WebApi.Controllers
 {
@@ -12,6 +13,7 @@ namespace WebApi.Controllers
     {
 
         [HttpGet]
+        [ServiceFilter(typeof(LimitFilter))]
         public IActionResult Get()
         {
             var parent = new Parent();

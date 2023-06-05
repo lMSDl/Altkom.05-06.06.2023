@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Interfaces;
 using System.Net;
+using WebApi.Filters;
 
 namespace WebApi.Controllers
 {
@@ -64,6 +65,7 @@ namespace WebApi.Controllers
 
 
         [HttpPost]
+        [ServiceFilter(typeof(ConsoleLogFilter))]
         public async Task<IActionResult> Post(T entity)
         {
             if(!ModelState.IsValid)

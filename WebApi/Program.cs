@@ -12,6 +12,7 @@ using FluentValidation.AspNetCore;
 
 using System.Text.Json.Serialization;
 using WebApi.Validators;
+using WebApi.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +50,8 @@ builder.Services.AddTransient<BaseFaker<User>, UserFaker>();
 builder.Services.AddSingleton<ICrudService<Product>, CrudService<Product>>();
 builder.Services.AddTransient<BaseFaker<Product>, ProductFaker>();
 
+builder.Services.AddTransient<ConsoleLogFilter>();
+builder.Services.AddSingleton(x => new LimitFilter(5));
 
 var app = builder.Build();
 

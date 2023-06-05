@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using WebApi.Filters;
 
 namespace WebApi.Controllers
 {
+    [ServiceFilter(typeof(LimitFilter))]
     public class WeatherForecastController : ApiController
     {
         private static readonly string[] Summaries = new[]

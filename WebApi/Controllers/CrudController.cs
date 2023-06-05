@@ -66,6 +66,18 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(T entity)
         {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if(entity.Id < 0)
+            {
+                ModelState.AddModelError(nameof(entity.Id), "Co to za id?");
+                ModelState.AddModelError(nameof(entity.Id), "Czy musi być na -?");
+                return BadRequest(ModelState);
+            }
+
+
             entity = await _service.CreateAsync(entity);
 
             return CreatedAtAction(nameof(Get), new { id = entity.Id }, entity);

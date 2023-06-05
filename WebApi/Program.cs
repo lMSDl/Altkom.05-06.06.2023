@@ -1,17 +1,24 @@
 using Bogus;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Bogus;
 using Services.Bogus.Fakers;
 using Services.Interfaces;
 using System.Diagnostics;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+
 using System.Text.Json.Serialization;
+using WebApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers()
+                .AddFluentValidation()
                 /*.AddJsonOptions(x =>
                 {
                     x.JsonSerializerOptions.IgnoreReadOnlyProperties= true;
@@ -24,10 +31,16 @@ builder.Services.AddControllers()
                     x.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                     x.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
                     //x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                    x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+                    x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
                     //x.SerializerSettings.DateFormatString = "yyy-MM-d_ff:ss;mm";
                     x.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.None;
                 });
+
+//builder.Services.AddFluentValidationAutoValidation(x => x.);
+builder.Services.AddTransient<IValidator<Product>, ProductValidator>();
+
+//wy³¹czenie automatycznej walidacji modelu
+builder.Services.Configure<ApiBehaviorOptions>(x => x.SuppressModelStateInvalidFilter = true);
 
 
 builder.Services.AddSingleton<IUsersService, UsersService>();

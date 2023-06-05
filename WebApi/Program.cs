@@ -13,9 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 
-builder.Services.AddSingleton<ICrudService<User>, CrudService<User>>();
+builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddTransient<BaseFaker<User>, UserFaker>();
 
+builder.Services.AddSingleton<ICrudService<Product>, CrudService<Product>>();
+builder.Services.AddTransient<BaseFaker<Product>, ProductFaker>();
 
 
 var app = builder.Build();

@@ -10,5 +10,17 @@ namespace Models
     {
         public string Name { get; set; } = string.Empty;
         public float Price { get; set; }
+
+        public string Description => $"{Name}: {Price} zł";
+
+
+        public string? Category { get; set; }
+        public int DaysToExpire { get; set; }
+
+
+        public bool ShouldSerializeName()
+        {
+            return Price > 100;
+        }
     }
 }

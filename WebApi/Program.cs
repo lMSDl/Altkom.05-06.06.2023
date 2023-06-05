@@ -5,12 +5,29 @@ using Services.Bogus;
 using Services.Bogus.Fakers;
 using Services.Interfaces;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+                /*.AddJsonOptions(x =>
+                {
+                    x.JsonSerializerOptions.IgnoreReadOnlyProperties= true;
+                    x.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault;
+                    x.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.Strict;
+                    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });*/
+                .AddNewtonsoftJson(x =>
+                {
+                    x.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+                    x.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Ignore;
+                    //x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.All;
+                    //x.SerializerSettings.DateFormatString = "yyy-MM-d_ff:ss;mm";
+                    x.SerializerSettings.DateParseHandling = Newtonsoft.Json.DateParseHandling.None;
+                });
 
 
 builder.Services.AddSingleton<IUsersService, UsersService>();

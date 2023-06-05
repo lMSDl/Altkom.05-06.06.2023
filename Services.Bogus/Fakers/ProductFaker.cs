@@ -13,7 +13,8 @@ namespace Services.Bogus.Fakers
 
             RuleFor(x => x.Name, x => x.Commerce.ProductName());
             RuleFor(x => x.Price, x => float.Parse(x.Commerce.Price()));
-        
+            RuleFor(x => x.Category, x => null);
+            RuleFor(x => x.DaysToExpire, x => x.Random.Int(0, 10));
         }
     }
 }

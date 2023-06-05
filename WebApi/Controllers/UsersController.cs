@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Interfaces;
+using System.Net;
 
 namespace WebApi.Controllers
 {
@@ -15,37 +16,60 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<User>> Get()
+        public async Task<IActionResult> Get()
         {
-            return _service.ReadAsync();
+            var users = await _service.ReadAsync();
+            return Ok(users);
         }
 
         [HttpGet("{id:int:min(1)}")]
-        public Task<User?> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return _service.ReadAsync(id);
+            var user = await _service.ReadAsync(id);
+            if (user == null)
+            {
+                //return StatusCode(StatusCodes.Status404NotFound);
+                return NotFound();
+            }
+
+            return Ok(user);
         }
 
         [HttpDelete("{id:int:min(1)}")]
-        public Task Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return _service.DeleteAsync(id);
+            var localEntity = await _service.ReadAsync(id);
+            if (localEntity == null)
+            {
+                return NotFound();
+            }
+
+            await _service.DeleteAsync(id);
+            return NoContent();
         }
 
 
         [HttpPut("{id:int:min(1)}")]
-        public Task Put(int id, /*[FromBody]*/User entity)
+        public async Task<IActionResult> Put(int id, /*[FromBody]*/User entity)
         {
-            return _service.UpdateAsync(id, entity);
+            var localEntity = await _service.ReadAsync(id);
+            if (localEntity == null)
+            {
+                return NotFound();
+            }
+
+            await _service.UpdateAsync(id, entity);
+            return NoContent();
         }
 
 
         [HttpPost]
-        public Task<User> Post(User entity)
+        public async Task<IActionResult> Post(User entity)
         {
-            return _service.CreateAsync(entity);
-        }
+            entity = await _service.CreateAsync(entity);
 
+            return CreatedAtAction(nameof(Get), new { id = entity.Id }, entity);
+        }
 
 
 

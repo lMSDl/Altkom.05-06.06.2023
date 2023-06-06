@@ -17,5 +17,7 @@ namespace Models
         public string Password { get; set; } = string.Empty;
         [EmailAddress(ErrorMessage = "błędny email")]
         public string Email { get; set; } = string.Empty;
+
+        public Roles Roles { get; set; }
     }
 }

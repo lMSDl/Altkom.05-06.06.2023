@@ -10,5 +10,6 @@ namespace Services.Interfaces
     public interface IUsersService : ICrudService<User>
     {
         Task<User?> FindByNameAsync(string username);
+        Task<User?> LoginAsync(string username, string password);
     }
 }

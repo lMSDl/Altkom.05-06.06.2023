@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Interfaces;
@@ -37,6 +38,8 @@ namespace WebApi.Controllers
         }
 
         [HttpDelete("{id:int:min(1)}")]
+        //[Authorize(Roles = "Delete")]
+        [Authorize(Roles = nameof(Roles.Delete))]
         public virtual async Task<IActionResult> Delete(int id)
         {
             var localEntity = await _service.ReadAsync(id);
@@ -66,7 +69,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(ConsoleLogFilter))]
-        public async Task<IActionResult> Post(T entity)
+        public virtual async Task<IActionResult> Post(T entity)
         {
             if(!ModelState.IsValid)
             {

@@ -8,7 +8,7 @@ namespace Services.Bogus
     public class CrudService<T> : ICrudService<T> where T : Entity
     {
         protected ICollection<T> Entities { get; }
-        public CrudService(BaseFaker<T> faker) : this(faker, new Random().Next(1, 100))
+        public CrudService(BaseFaker<T> faker) : this(faker, new Random().Next(1, 10))
         {
         }
         public CrudService(BaseFaker<T> faker, int count)
@@ -17,7 +17,7 @@ namespace Services.Bogus
         }
 
 
-        public Task<T> CreateAsync(T entity)
+        public virtual Task<T> CreateAsync(T entity)
         {
             entity.Id = Entities.Max(x => x.Id) + 1;
             Entities.Add(entity);
@@ -41,7 +41,7 @@ namespace Services.Bogus
             return Task.FromResult(Entities.ToList().AsEnumerable());
         }
 
-        public async Task UpdateAsync(int id, T entity)
+        public virtual async Task UpdateAsync(int id, T entity)
         {
             var localEntity = await ReadAsync(id);
             if (localEntity is null)

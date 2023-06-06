@@ -19,5 +19,16 @@ namespace Services.Bogus
         {
             return Task.FromResult(Entities.FirstOrDefault(x => x.Username.Contains(username)));
         }
+
+        public Task<User?> LoginAsync(string username, string password)
+        {
+            return Task.FromResult(Entities.Where(x => x.Username == username).SingleOrDefault(x => BCrypt.Net.BCrypt.Verify(password, x.Password)));
+        }
+
+        public override Task<User> CreateAsync(User entity)
+        {
+            entity.Password = BCrypt.Net.BCrypt.HashPassword(entity.Password);
+            return base.CreateAsync(entity);
+        }
     }
 }

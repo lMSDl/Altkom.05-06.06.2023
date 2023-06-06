@@ -1,19 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using WebApi.Services;
 
 namespace WebApi.Controllers
 {
+    [Authorize]
     public class UsersController : CrudController<User>
     {
         private IUsersService _service;
+        private AuthService _authService;
 
-        public UsersController(IUsersService service) : base(service)
+        public UsersController(IUsersService service, AuthService authService) : base(service)
         {
             _service = service;
+            _authService = authService;
         }
 
         //wyłączamy metodę z routingu
@@ -28,6 +33,14 @@ namespace WebApi.Controllers
 
 
         [HttpGet]
+        //potrzeba każda z wymienionych ról (sprawdzanie w osobnych filtrach)
+        /*[Authorize(Roles = "UserAdmin")]
+        [Authorize(Roles = "Read")]*/
+        [Authorize(Roles = nameof(Roles.UserAdmin))]
+        [Authorize(Roles = nameof(Roles.Read))]
+
+        //potrzebna jedna z wymienionych ról
+        //[Authorize(Roles = "Read, UserAdmin")]
         public async Task<IActionResult> Get(string? username)
         {
             if(string.IsNullOrWhiteSpace(username))
@@ -47,6 +60,24 @@ namespace WebApi.Controllers
         public string Text(string text)
         {
             return text;
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(User user)
+        {
+            var token = await _authService.AuthAsync(user.Username, user.Password);
+
+            if (token == null)
+                return Unauthorized();
+
+            return Ok(token);
+        }
+
+        [AllowAnonymous]
+        public override Task<IActionResult> Post(User entity)
+        {
+            return base.Post(entity);
         }
     }
 }

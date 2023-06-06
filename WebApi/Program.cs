@@ -14,6 +14,12 @@ using System.Text.Json.Serialization;
 using WebApi.Validators;
 using WebApi.Filters;
 using Microsoft.AspNetCore.ResponseCompression;
+using WebApi.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using WebApi.Requrements;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,13 +75,51 @@ builder.Services.AddTransient<BaseFaker<Product>, ProductFaker>();
 builder.Services.AddTransient<ConsoleLogFilter>();
 builder.Services.AddSingleton(x => new LimitFilter(5));
 
+
+
+builder.Services.AddTransient<AuthService>();
+builder.Services.AddSingleton<IAuthorizationHandler, KnownMailHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    //options.AddPolicy("knownMailDomain", policy => policy.AddRequirements(new KnownMailRequirement("bb.cc")));
+    //alternatywa
+    options.AddPolicy("knownMailDomain", policy => policy/*.RequireClaim(ClaimTypes.Email, "aa@bb.cc")*/
+                                                        .RequireAssertion((handler) => 
+                                                        handler.User.Claims.SingleOrDefault(x => x.Type == ClaimTypes.Email)?.Value.EndsWith("bb.cc") ?? false));
+});
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(AuthService.KEY),
+            ValidateIssuerSigningKey = true,
+
+            //wy³¹czamy walidacjê (domyœlnie w³¹czona)
+            ValidateIssuer = false,
+            //sprawdzenie zgodnoœci Audience
+            /*ValidateAudience = false*/
+        };
+        //options.Authority = "zxc";
+        options.Audience = "abc";
+    });
+
+
 var app = builder.Build();
 
 
 app.UseResponseCompression();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.Use(async (context, next) =>
 {
+
 if (Activity.Current == null)
 {
     Console.WriteLine($"{context.TraceIdentifier}");

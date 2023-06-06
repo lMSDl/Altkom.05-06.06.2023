@@ -96,6 +96,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
         {
+            ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(AuthService.KEY),
             ValidateIssuerSigningKey = true,
 
@@ -106,7 +107,15 @@ builder.Services.AddAuthentication(options =>
         };
         //options.Authority = "zxc";
         options.Audience = "abc";
-    });
+    })
+    //    .AddCookie(options =>
+    //    {
+    //        options.ExpireTimeSpan = TimeSpan.FromSeconds(30);
+    //        options.LoginPath = "/api/users/login";
+    //        options.AccessDeniedPath = "/bye";
+    //    });
+
+    ;
 
 
 var app = builder.Build();

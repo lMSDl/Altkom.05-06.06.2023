@@ -47,6 +47,7 @@ namespace WebApi.Services
             claims.AddRange(user.Roles.ToString().Split(", ").Select(x => new Claim(ClaimTypes.Role, x)));
 
 
+
             var tokenDescriptor = new SecurityTokenDescriptor();
             tokenDescriptor.Expires = DateTime.Now.AddMinutes(5);
             tokenDescriptor.Subject = new ClaimsIdentity(claims);

@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Services.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Security.Claims;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -67,9 +70,15 @@ namespace WebApi.Controllers
         public async Task<IActionResult> Login(User user)
         {
             var token = await _authService.AuthAsync(user.Username, user.Password);
-
             if (token == null)
                 return Unauthorized();
+
+
+            //Generacja ciasteczka
+            /*var claimIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimPrincipal = new ClaimsPrincipal(claimIdentity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimPrincipal);*/
+
 
             return Ok(token);
         }

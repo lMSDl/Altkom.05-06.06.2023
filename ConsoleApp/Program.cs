@@ -9,8 +9,14 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
+
+var httpClient = new HttpClient();
+var openApiClient = new WebAPI.WebApiService("http://localhost:5209", httpClient);
+
+var parent = await openApiClient.ParentsAsync();
+
 var signalR = new HubConnectionBuilder()
-    .WithUrl("http://localhost:5000/SignalR/Demo")
+    .WithUrl("http://localhost:5209/SignalR/Demo")
         .WithAutomaticReconnect()
     .Build();
 

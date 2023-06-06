@@ -14,6 +14,7 @@ namespace WebApi.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(LimitFilter))]
+        [ProducesResponseType(typeof(Parent), statusCode: StatusCodes.Status200OK)]
         public IActionResult Get()
         {
             var parent = new Parent();

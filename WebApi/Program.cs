@@ -119,13 +119,22 @@ builder.Services.AddAuthentication(options =>
     ;
 builder.Services.AddSignalR();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(x => x.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "WebApi", Version = "v1" }))
+        .AddSwaggerGenNewtonsoftSupport();
+
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "SwaggerWebApi v1"));
 
 
 app.UseResponseCompression();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 app.Use(async (context, next) =>
 {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Grpc.Core;
 using GrpcService.Protos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -12,11 +13,13 @@ namespace GrpcService.Services
     {
         private IUsersService _service;
         private IMapper _mapper;
+        private IValidator<User> _validator;
 
-        public UsersGrpcService(IUsersService service, IMapper mapper)
+        public UsersGrpcService(IUsersService service, IMapper mapper, IValidator<User> validator)
         {
             _service = service;
             _mapper = mapper;
+            _validator = validator;
         }
 
         public override async Task<User> Create(User request, ServerCallContext context)
@@ -42,6 +45,9 @@ namespace GrpcService.Services
 
         public override async Task<User> ReadById(User request, ServerCallContext context)
         {
+            if (_validator.Validate(request).IsValid)
+                return new User();
+
             var result = await _service.ReadAsync(request.Id);
 
             return _mapper.Map<User>(result);

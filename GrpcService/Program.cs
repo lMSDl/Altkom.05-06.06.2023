@@ -1,6 +1,8 @@
 using AutoMapper;
+using FluentValidation;
 using GrpcService.AutoMapper;
 using GrpcService.Services;
+using GrpcService.Validators;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Models;
 using Services.Bogus;
@@ -15,6 +17,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(new MapperConfiguration(x => x.AddProfile<UserMappingProfile>()).CreateMapper());
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddTransient<BaseFaker<User>, UserFaker>();
+builder.Services.AddScoped<IValidator<GrpcService.Protos.Users.User>, UserValidator>();
 
 // Add services to the container.
 builder.Services.AddGrpc();

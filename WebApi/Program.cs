@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApi.Requrements;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -116,7 +117,7 @@ builder.Services.AddAuthentication(options =>
     //    });
 
     ;
-
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -143,5 +144,7 @@ else
 // Configure the HTTP request pipeline.
 
 app.MapControllers();
+app.MapHub<DemoHub>("SignalR/Demo");
+
 
 app.Run();

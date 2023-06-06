@@ -1,6 +1,7 @@
 ﻿
 
 
+using Microsoft.AspNetCore.SignalR.Client;
 using Models;
 using Newtonsoft.Json;
 using System.Net.Http;
@@ -8,8 +9,46 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
+var signalR = new HubConnectionBuilder()
+    .WithUrl("http://localhost:5000/SignalR/Demo")
+        .WithAutomaticReconnect()
+    .Build();
 
-HttpClientHandler clientHandler = new()
+signalR.Reconnecting += SignalR_Reconnecting;
+signalR.Reconnected += SignalR_Reconnected;
+
+Task SignalR_Reconnected(string? arg)
+{
+    Console.WriteLine("Connected");
+    return Task.CompletedTask;
+}
+
+Task SignalR_Reconnecting(Exception? arg)
+{
+    if (arg != null)
+        Console.WriteLine(arg.Message);
+    Console.WriteLine("Reconnecting...");
+    return Task.CompletedTask;
+}
+
+
+signalR.On<string>(nameof(Welcome), Welcome);
+signalR.On<string>("TextMessage", x => Console.WriteLine(x));
+
+
+async void Welcome(string message)
+{
+    Console.WriteLine(message);
+    await signalR.SendAsync("SayHelloToOthers", $"Hello my name is {signalR.ConnectionId}");
+}
+
+await signalR.StartAsync();
+
+await signalR.SendAsync("JoinToGroup", (DateTime.Now.Second % 3).ToString());
+
+Console.ReadLine();
+
+/*HttpClientHandler clientHandler = new()
 {
     AutomaticDecompression = System.Net.DecompressionMethods.Brotli | System.Net.DecompressionMethods.GZip,
 
@@ -93,4 +132,4 @@ static async Task<T> ReadAsJson<T>(HttpResponseMessage response)
 {
     string content = await response.Content.ReadAsStringAsync();
     return JsonConvert.DeserializeObject<T>(content);
-}
+}*/
